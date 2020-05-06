@@ -5,7 +5,7 @@ import vi from './languages/vi';
 
 i18n.use(reactI18nextModule).init({
   fallbackLng: 'en',
-  lng: 'vi',
+  lng: 'en',
   resources: {
     en: { translation: en },
     vi: { translation: vi },
