@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, TextInput, Image } from 'react-native';
+import { StyleSheet, View, TextInput, Image, ScrollView } from 'react-native';
 import {
   Container,
   TouchableOpacity,
@@ -11,11 +11,15 @@ import i18n from '@src/locale';
 import IconClose from '@src/assets/ico-close-modal.png';
 import colors from '@src/constants/colors';
 import NavigationService from '@src/navigation/NavigationService';
+import { SignUpStore } from '@src/stores/SignUpStore';
+import { observer } from 'mobx-react';
 
+@observer
 export default class extends React.Component {
   passwordInput: TextInput | null = null;
   lastNameInput: TextInput | null = null;
   emailInput: TextInput | null = null;
+  signUpStore = new SignUpStore();
 
   _submitFirstName = () => {
     this.lastNameInput && this.lastNameInput.focus();
@@ -38,6 +42,7 @@ export default class extends React.Component {
   _signUp = () => {};
 
   render() {
+    const store = this.signUpStore;
     return (
       <Container>
         <Header
@@ -45,63 +50,75 @@ export default class extends React.Component {
           onPressLeft={this._onPressClose}
           backgroundColor="transparent"
         />
-        <View style={styles.container}>
-          <Text style={styles.title}>
-            {String(i18n.t('signup.title')).toUpperCase()}
-          </Text>
-          <View style={styles.inputContainer}>
-            <View style={styles.nameContainer}>
-              <TextInput
-                style={styles.firstNameInput}
-                placeholder={i18n.t('signup.first_name')}
-                placeholderTextColor={colors.inputPlaceHolder}
-                autoCapitalize="words"
-                returnKeyType="next"
-                onSubmitEditing={this._submitFirstName}
-              />
-              <View style={styles.vSeparator} />
-              <TextInput
-                ref={r => (this.lastNameInput = r)}
-                style={styles.lastNameInput}
-                placeholder={i18n.t('signup.last_name')}
-                placeholderTextColor={colors.inputPlaceHolder}
-                autoCapitalize="words"
-                returnKeyType="next"
-                onSubmitEditing={this._submitLastName}
-              />
-            </View>
-            <View style={styles.separator} />
-            <TextInput
-              ref={r => (this.emailInput = r)}
-              style={styles.emailInput}
-              placeholder={i18n.t('signup.email')}
-              placeholderTextColor={colors.inputPlaceHolder}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              returnKeyType="next"
-              onSubmitEditing={this._submitEmail}
-            />
-            <View style={styles.separator} />
-            <TextInput
-              ref={r => (this.passwordInput = r)}
-              style={styles.passwordInput}
-              placeholderTextColor={colors.inputPlaceHolder}
-              placeholder={i18n.t('signup.password')}
-              returnKeyType="done"
-              secureTextEntry
-              onSubmitEditing={this._signUp}
-            />
-          </View>
-          <ParsedText style={styles.termText}>
-            {i18n.t('signup.term')}
-          </ParsedText>
-          <View style={styles.spacingView} />
-          <TouchableOpacity style={styles.signUpButton}>
-            <Text style={styles.signUpText}>
+        <ScrollView contentContainerStyle={styles.scrollView}>
+          <View style={styles.container}>
+            <Text style={styles.title}>
               {String(i18n.t('signup.title')).toUpperCase()}
             </Text>
-          </TouchableOpacity>
-        </View>
+            <View style={styles.inputContainer}>
+              <View style={styles.nameContainer}>
+                <TextInput
+                  value={store.firstName}
+                  onChangeText={store.setFirstName}
+                  style={styles.firstNameInput}
+                  placeholder={i18n.t('signup.first_name')}
+                  placeholderTextColor={colors.inputPlaceHolder}
+                  autoCapitalize="words"
+                  returnKeyType="next"
+                  onSubmitEditing={this._submitFirstName}
+                />
+                <View style={styles.vSeparator} />
+                <TextInput
+                  value={store.lastName}
+                  onChangeText={store.setLastName}
+                  ref={r => (this.lastNameInput = r)}
+                  style={styles.lastNameInput}
+                  placeholder={i18n.t('signup.last_name')}
+                  placeholderTextColor={colors.inputPlaceHolder}
+                  autoCapitalize="words"
+                  returnKeyType="next"
+                  onSubmitEditing={this._submitLastName}
+                />
+              </View>
+              <View style={styles.separator} />
+              <TextInput
+                value={store.email}
+                onChangeText={store.setEmail}
+                ref={r => (this.emailInput = r)}
+                style={styles.emailInput}
+                placeholder={i18n.t('signup.email')}
+                placeholderTextColor={colors.inputPlaceHolder}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                returnKeyType="next"
+                onSubmitEditing={this._submitEmail}
+              />
+              <View style={styles.separator} />
+              <TextInput
+                value={store.password}
+                onChangeText={store.setPassword}
+                ref={r => (this.passwordInput = r)}
+                style={styles.passwordInput}
+                placeholderTextColor={colors.inputPlaceHolder}
+                placeholder={i18n.t('signup.password')}
+                returnKeyType="done"
+                secureTextEntry
+                onSubmitEditing={this._signUp}
+              />
+            </View>
+            <ParsedText style={styles.termText}>
+              {i18n.t('signup.term')}
+            </ParsedText>
+            <View style={styles.spacingView} />
+            <TouchableOpacity
+              onPress={store.signUp}
+              style={styles.signUpButton}>
+              <Text style={styles.signUpText}>
+                {String(i18n.t('signup.title')).toUpperCase()}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
       </Container>
     );
   }
@@ -111,6 +128,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingBottom: Container.bottomSpacing,
+  },
+  scrollView: {
+    flexGrow: 1,
   },
   title: {
     marginTop: 35,

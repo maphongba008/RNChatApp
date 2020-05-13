@@ -8,7 +8,9 @@ import Screens from './Screens';
 import Login from '../features/authentication/login';
 import SignUp from '../features/authentication/signup';
 import NavigationService from './NavigationService';
-
+//
+import ConversationScreen from '../features/app/conversations';
+import LoadingHud from './LoadingHud';
 const AuthenticationStack = createStackNavigator(
   {
     [Screens.LOGIN_SCREEN]: Login,
@@ -20,7 +22,7 @@ const AuthenticationStack = createStackNavigator(
 );
 
 const AppTab = createBottomTabNavigator({
-  [Screens.SIGN_UP_SCREEN]: SignUp,
+  [Screens.CONVERSATION_SCREEN]: ConversationScreen,
 });
 
 const SwitchNavigator = createAppContainer(
@@ -57,6 +59,11 @@ const ReloadAppOnLanguageChange = withNamespaces('common', {
 
 export default class App extends React.Component {
   render() {
-    return <ReloadAppOnLanguageChange />;
+    return (
+      <React.Fragment>
+        <ReloadAppOnLanguageChange />
+        <LoadingHud />
+      </React.Fragment>
+    );
   }
 }
