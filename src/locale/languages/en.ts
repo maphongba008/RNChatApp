@@ -16,4 +16,7 @@ export default {
     password: 'Password',
     term: 'By tapping "Sign Up" you agree\nto the [terms & conditions]',
   },
+  chat: {
+    title: 'Chats',
+  },
 };

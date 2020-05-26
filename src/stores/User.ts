@@ -10,4 +10,8 @@ export class User {
     this.lastName = lastName;
     this.email = email;
   }
+
+  get displayName() {
+    return this.firstName + ' ' + this.lastName;
+  }
 }

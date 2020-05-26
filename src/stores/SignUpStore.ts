@@ -87,16 +87,16 @@ export class SignUpStore {
           email: this.email,
           id: firebaseUser.uid,
         });
-      // update user info to firestore
-      // success
-      const user = new User(
-        firebaseUser.uid,
-        this.firstName,
-        this.lastName,
-        this.email,
-      );
-      AppStore.setUser(user);
-      NavigationService.navigate(Screens.CONVERSATION_SCREEN);
+      // // update user info to firestore
+      // // success
+      // const user = new User(
+      //   firebaseUser.uid,
+      //   this.firstName,
+      //   this.lastName,
+      //   this.email,
+      // );
+      // AppStore.setUser(user);
+      // NavigationService.navigate(Screens.CONVERSATION_SCREEN);
     } catch (e) {
       Alert.alert('Error', e.message);
     }

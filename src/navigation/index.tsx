@@ -10,7 +10,10 @@ import SignUp from '../features/authentication/signup';
 import NavigationService from './NavigationService';
 //
 import ConversationScreen from '../features/app/conversations';
+import UsersScreen from '../features/app/users';
 import LoadingHud from './LoadingHud';
+import SplashScreen from '@src/features/splash';
+import Tabbar from './Tabbar';
 const AuthenticationStack = createStackNavigator(
   {
     [Screens.LOGIN_SCREEN]: Login,
@@ -21,12 +24,19 @@ const AuthenticationStack = createStackNavigator(
   },
 );
 
-const AppTab = createBottomTabNavigator({
-  [Screens.CONVERSATION_SCREEN]: ConversationScreen,
-});
+const AppTab = createBottomTabNavigator(
+  {
+    [Screens.CONVERSATION_SCREEN]: ConversationScreen,
+    [Screens.USERS_SCREEN]: UsersScreen,
+  },
+  {
+    tabBarComponent: ({ navigation }) => <Tabbar navigation={navigation} />,
+  },
+);
 
 const SwitchNavigator = createAppContainer(
   createSwitchNavigator({
+    [Screens.SPLASH_SCREEN]: SplashScreen,
     [Screens.AUTHENTICATION_STACK]: AuthenticationStack,
     [Screens.APP_TAB]: AppTab,
   }),
