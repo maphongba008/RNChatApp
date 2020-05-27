@@ -1,15 +1,29 @@
 import React from 'react';
-import { Text } from '@src/components';
+import { Text, Container, Header } from '@src/components';
 import AppStore from '@src/stores/AppStore';
 import { View } from 'react-native';
+import i18n from '@src/locale';
+import List from './components/List';
+import { observer } from 'mobx-react';
+import { User } from '@src/stores/User';
 
+@observer
 export default class extends React.Component {
+  componentDidMount = () => {
+    AppStore.loadUsers();
+  };
+
+  _onPressUser = (user: User) => {
+    AppStore.createConversation(user);
+  };
+
   render() {
     console.log('user ', AppStore.user);
     return (
-      <View>
-        <Text style={{ marginTop: 100 }}>USERS SCREEN</Text>
-      </View>
+      <Container>
+        <Header title={i18n.t('users.title')} />
+        <List users={AppStore.users} onPressUser={this._onPressUser} />
+      </Container>
     );
   }
 }

@@ -86,6 +86,7 @@ export class SignUpStore {
           lastName: this.lastName,
           email: this.email,
           id: firebaseUser.uid,
+          createdAt: Date.now(),
         });
       // // update user info to firestore
       // // success

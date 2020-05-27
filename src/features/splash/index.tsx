@@ -13,7 +13,7 @@ let lastAuthStateChange = Date.now();
 export default class SplashScreen extends React.Component {
   componentDidMount = () => {
     auth().onAuthStateChanged(async user => {
-      console.log('onAuthStateChanged');
+      console.log('onAuthStateChanged', user);
       if (Date.now() - lastAuthStateChange < 100) {
         lastAuthStateChange = Date.now();
         return;

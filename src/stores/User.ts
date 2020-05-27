@@ -1,8 +1,16 @@
+import { Expose } from 'class-transformer';
+
 export class User {
+  @Expose()
   id = '';
+  @Expose()
   firstName = '';
+  @Expose()
   lastName = '';
+  @Expose()
   email = '';
+  @Expose()
+  createdAt = 0;
 
   constructor(id: string, firstName: string, lastName: string, email: string) {
     this.id = id;

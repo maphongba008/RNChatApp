@@ -19,4 +19,7 @@ export default {
   chat: {
     title: 'Chats',
   },
+  users: {
+    title: 'Users',
+  },
 };
