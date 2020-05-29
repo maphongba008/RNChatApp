@@ -1,5 +1,6 @@
 import { User } from './User';
 import moment from 'moment';
+import { Expose } from 'class-transformer';
 
 export default class Conversation {
   constructor(
@@ -18,17 +19,28 @@ export default class Conversation {
     this.unreadCount = unreadCount;
   }
 
+  @Expose()
   id: string = '';
 
+  @Expose()
   name: string = '';
+
+  @Expose()
+  lastMessage?: string = undefined;
+
+  @Expose()
+  createdAt: number = 0;
+
+  @Expose()
+  updatedAt: number = 0;
 
   users: User[] = [];
 
-  lastMessage?: string = undefined;
-
-  updatedAt: number = 0;
-
   unreadCount: number = 0;
+
+  setUsers = (users: User[]) => {
+    this.users = users;
+  };
 
   getConversationName = (currentUserId: string) => {
     if (this.name) {
@@ -44,4 +56,12 @@ export default class Conversation {
   get updatedAtText() {
     return moment(this.updatedAt).toNow();
   }
+
+  getDefaultUnreads = (currentUserId: string) => {
+    return this.users.filter(t => t.id !== currentUserId).map(t => t.id);
+  };
+
+  findUser = (userId: string) => {
+    return this.users.filter(t => t.id === userId)[0];
+  };
 }

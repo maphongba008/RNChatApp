@@ -8,7 +8,7 @@ import Screens from '@src/navigation/Screens';
 import { User } from '@src/stores/User';
 import AppStore from '@src/stores/AppStore';
 
-let lastAuthStateChange = Date.now();
+let lastAuthStateChange = 0;
 
 export default class SplashScreen extends React.Component {
   componentDidMount = () => {

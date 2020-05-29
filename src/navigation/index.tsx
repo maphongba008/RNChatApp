@@ -11,6 +11,7 @@ import NavigationService from './NavigationService';
 //
 import ConversationScreen from '../features/app/conversations';
 import UsersScreen from '../features/app/users';
+import ChatScreen from '../features/app/chat';
 import LoadingHud from './LoadingHud';
 import SplashScreen from '@src/features/splash';
 import Tabbar from './Tabbar';
@@ -24,9 +25,26 @@ const AuthenticationStack = createStackNavigator(
   },
 );
 
-const AppTab = createBottomTabNavigator(
+const ConversationStack = createStackNavigator(
   {
     [Screens.CONVERSATION_SCREEN]: ConversationScreen,
+    [Screens.CHAT_SCREEN]: ChatScreen,
+  },
+  {
+    headerMode: 'none',
+  },
+);
+
+ConversationStack.navigationOptions = ({ navigation }: { navigation: any }) => {
+  const isFirstScreen = navigation.state.index === 0;
+  return {
+    tabBarVisible: isFirstScreen,
+  };
+};
+
+const AppTab = createBottomTabNavigator(
+  {
+    [Screens.CONVERSATION_STACK]: ConversationStack,
     [Screens.USERS_SCREEN]: UsersScreen,
   },
   {

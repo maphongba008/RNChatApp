@@ -7,13 +7,22 @@ import NavigationService from '@src/navigation/NavigationService';
 import Screens from '@src/navigation/Screens';
 import ConversationList from './components/List';
 import i18n from '@src/locale';
+import { observer } from 'mobx-react';
 import Conversation from '@src/stores/Conversation';
-import { User } from '@src/stores/User';
 
+@observer
 export default class extends React.Component {
   _logout = () => {
     auth().signOut();
     NavigationService.navigate(Screens.AUTHENTICATION_STACK);
+  };
+
+  componentDidMount = () => {
+    AppStore.loadConversations();
+  };
+
+  _onPressConversation = (conversation: Conversation) => {
+    NavigationService.navigate(Screens.CHAT_SCREEN, { conversation });
   };
 
   render() {
@@ -21,39 +30,14 @@ export default class extends React.Component {
     if (!AppStore.user) {
       return null;
     }
-    const testData = [
-      new Conversation(
-        '1',
-        '',
-        [new User('2', 'A', 'B', 'abc@gmail.com'), AppStore.user],
-        'Hello world',
-        Date.now() - 2 * 60 * 1000,
-        5,
-      ),
-      new Conversation(
-        '2',
-        '',
-        [new User('2', 'B', 'C', 'abc@gmail.com'), AppStore.user],
-        '',
-        Date.now(),
-        0,
-      ),
-      new Conversation(
-        '3',
-        '',
-        [new User('2', 'A', 'B', 'abc@gmail.com'), AppStore.user],
-        'Hello world',
-        Date.now() - 2 * 60 * 1000,
-        5,
-      ),
-    ];
 
     return (
       <Container>
         <Header title={i18n.t('chat.title')} />
         <ConversationList
           currentUserId={AppStore.user.id}
-          conversations={testData}
+          conversations={AppStore.conversations}
+          onPressConversation={this._onPressConversation}
         />
       </Container>
     );

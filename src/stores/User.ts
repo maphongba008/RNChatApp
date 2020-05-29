@@ -3,12 +3,16 @@ import { Expose } from 'class-transformer';
 export class User {
   @Expose()
   id = '';
+
   @Expose()
   firstName = '';
+
   @Expose()
   lastName = '';
+
   @Expose()
   email = '';
+
   @Expose()
   createdAt = 0;
 

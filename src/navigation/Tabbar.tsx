@@ -13,7 +13,7 @@ type TabbarProps = {
 const Tabs = [
   {
     icon: IconChat,
-    screen: Screens.CONVERSATION_SCREEN,
+    screen: Screens.CONVERSATION_STACK,
   },
   {
     icon: IconUsers,

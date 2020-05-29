@@ -2,10 +2,12 @@ import React from 'react';
 import { View, FlatList, StyleSheet, Text } from 'react-native';
 import Conversation from '@src/stores/Conversation';
 import colors from '@src/constants/colors';
+import { TouchableOpacity } from '@src/components';
 
 type ConversationListProps = {
   conversations: Conversation[];
   currentUserId: string;
+  onPressConversation: (conversation: Conversation) => void;
 };
 
 const bgColors = ['red', 'green', 'blue'];
@@ -18,7 +20,9 @@ export default class ConversationList extends React.PureComponent<
     const backgroundColor =
       bgColors[conversationName.charCodeAt(0) % bgColors.length];
     return (
-      <View style={styles.container}>
+      <TouchableOpacity
+        style={styles.container}
+        onPress={() => this.props.onPressConversation(data)}>
         <View style={[styles.avatarView, { backgroundColor }]}>
           <Text style={styles.avatarText}>{conversationName.charAt(0)}</Text>
         </View>
@@ -38,7 +42,7 @@ export default class ConversationList extends React.PureComponent<
             <Text style={styles.updatedAtText}>{data.updatedAtText}</Text>
           )}
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 

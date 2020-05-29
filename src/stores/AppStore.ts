@@ -11,7 +11,11 @@ class AppStore {
   @observable
   users: User[] = [];
 
+  @observable
   conversations: Conversation[] = [];
+
+  userAddedSubscriber: (() => void) | null = null;
+  conversationAddedSubscriber: (() => void) | null = null;
 
   messages: Message[] = [];
 
@@ -20,21 +24,49 @@ class AppStore {
   };
 
   loadUsers = async () => {
-    LoadingHud.show();
-    const users = await ChatServices.loadUsers();
-    this.users = users.filter(t => this.user && t.id !== this.user.id);
-    LoadingHud.hide();
+    // LoadingHud.show();
+    // const users = await ChatServices.loadUsers();
+    // this.users = users.filter(t => this.user && t.id !== this.user.id);
+    // LoadingHud.hide();
     this.listenForUserAdded();
   };
 
+  loadConversations = async () => {
+    if (!this.user) {
+      return;
+    }
+    // LoadingHud.show();
+    // // @ts-ignore
+    // this.conversations = await ChatServices.loadConversations(this.user);
+    // LoadingHud.hide();
+    this.listenForConversationAdded();
+  };
+
+  unsubscribe = () => {
+    this.userAddedSubscriber && this.userAddedSubscriber();
+    this.conversationAddedSubscriber && this.conversationAddedSubscriber();
+  };
+
   listenForUserAdded = () => {
-    const lastUpdatedUser = this.users.sort((a, b) =>
-      a.createdAt > b.createdAt ? -1 : 1,
-    )[0];
-    const lastUpdated = lastUpdatedUser ? lastUpdatedUser.createdAt : 0;
-    ChatServices.listenForUserRegistered(lastUpdated, user => {
-      this.users = [...this.users, user];
+    this.userAddedSubscriber && this.userAddedSubscriber();
+    this.userAddedSubscriber = ChatServices.listenForUserRegistered(users => {
+      const id = this.user ? this.user.id : '';
+      this.users = [...this.users, ...users.filter(t => t.id !== id)];
     });
+  };
+
+  listenForConversationAdded = () => {
+    if (!this.user) {
+      return;
+    }
+    this.conversationAddedSubscriber && this.conversationAddedSubscriber();
+
+    this.conversationAddedSubscriber = ChatServices.listenForConversationAdd(
+      this.user,
+      conversations => {
+        this.conversations = [...conversations, ...this.conversations];
+      },
+    );
   };
 
   createConversation = async (user: User) => {
@@ -46,7 +78,10 @@ class AppStore {
         ? this.user.id + '_' + user.id
         : user.id + this.user.id;
     // check if conversationId exist or not
-    let conversation = await ChatServices.getConversation(conversationId);
+    let conversation = await ChatServices.loadConversation(
+      conversationId,
+      this.user,
+    );
     if (!conversation) {
       // create new
       console.log('create new');
