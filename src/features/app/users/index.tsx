@@ -6,6 +6,8 @@ import i18n from '@src/locale';
 import List from './components/List';
 import { observer } from 'mobx-react';
 import { User } from '@src/stores/User';
+import NavigationService from '@src/navigation/NavigationService';
+import Screens from '@src/navigation/Screens';
 
 @observer
 export default class extends React.Component {
@@ -13,8 +15,9 @@ export default class extends React.Component {
     AppStore.loadUsers();
   };
 
-  _onPressUser = (user: User) => {
-    AppStore.createConversation(user);
+  _onPressUser = async (user: User) => {
+    const conversation = await AppStore.createConversation(user);
+    NavigationService.navigate(Screens.CHAT_SCREEN, { conversation });
   };
 
   render() {

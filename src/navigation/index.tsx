@@ -15,6 +15,7 @@ import ChatScreen from '../features/app/chat';
 import LoadingHud from './LoadingHud';
 import SplashScreen from '@src/features/splash';
 import Tabbar from './Tabbar';
+import CreateGroupScreen from '@src/features/app/createGroup';
 const AuthenticationStack = createStackNavigator(
   {
     [Screens.LOGIN_SCREEN]: Login,
@@ -42,13 +43,39 @@ ConversationStack.navigationOptions = ({ navigation }: { navigation: any }) => {
   };
 };
 
-const AppTab = createBottomTabNavigator(
+const UserStack = createStackNavigator(
   {
-    [Screens.CONVERSATION_STACK]: ConversationStack,
     [Screens.USERS_SCREEN]: UsersScreen,
+
+    [Screens.CHAT_SCREEN]: ChatScreen,
+  },
+  { headerMode: 'none' },
+);
+
+UserStack.navigationOptions = ({ navigation }: { navigation: any }) => {
+  const isFirstScreen = navigation.state.index === 0;
+  return {
+    tabBarVisible: isFirstScreen,
+  };
+};
+
+const AppNavigator = createStackNavigator(
+  {
+    AppTab: createBottomTabNavigator(
+      {
+        [Screens.CONVERSATION_STACK]: ConversationStack,
+        [Screens.USER_STACK]: UserStack,
+      },
+      {
+        tabBarComponent: ({ navigation }) => <Tabbar navigation={navigation} />,
+      },
+    ),
+    // modals
+    [Screens.CREATE_GROUP_CHAT]: CreateGroupScreen,
   },
   {
-    tabBarComponent: ({ navigation }) => <Tabbar navigation={navigation} />,
+    headerMode: 'none',
+    mode: 'modal',
   },
 );
 
@@ -56,7 +83,7 @@ const SwitchNavigator = createAppContainer(
   createSwitchNavigator({
     [Screens.SPLASH_SCREEN]: SplashScreen,
     [Screens.AUTHENTICATION_STACK]: AuthenticationStack,
-    [Screens.APP_TAB]: AppTab,
+    [Screens.APP_TAB]: AppNavigator,
   }),
 );
 

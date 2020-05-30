@@ -160,6 +160,7 @@ class ChatServices {
     const conversation = plainToClass(Conversation, data, {
       excludeExtraneousValues: true,
     });
+    conversation.setUsers([user1, user2]);
     return conversation;
   };
 
@@ -173,7 +174,6 @@ class ChatServices {
       .collection('messages')
       .orderBy('createdAt')
       .onSnapshot(snapshot => {
-        console.log('onSnapshot message', snapshot);
         snapshot.docChanges().map(doc => {
           if (doc.type === 'added') {
             // message arrived;
@@ -186,26 +186,99 @@ class ChatServices {
       });
   };
 
-  sendMessage = (
+  sendMessage = async (
     conversationId: string,
     senderId: string,
     content: string,
     type: MessageType,
     unreads: string[],
   ) => {
+    const now = Date.now();
     const doc = firestore()
       .collection('conversations')
       .doc(conversationId)
       .collection('messages')
       .doc();
-    doc.set({
+    // send message to /conversations/{id}/messages
+    const sendMessagePromise = doc.set({
       id: doc.id,
-      createdAt: Date.now(),
+      createdAt: now,
       content,
       senderId,
       type,
       unreads: unreads,
     });
+    // update last message to /conversations/{id}/
+    const updateLastMessagePromise = firestore()
+      .collection('conversations')
+      .doc(conversationId)
+      .update({
+        updatedAt: now,
+        lastMessage: content,
+      });
+    await Promise.all([sendMessagePromise, updateLastMessagePromise]);
+  };
+
+  listenForConversationChanged = (
+    conversationId: string,
+    onChanged: (conversation: Conversation) => void,
+  ) => {
+    return firestore()
+      .collection('conversations')
+      .doc(conversationId)
+      .onSnapshot(snapshot => {
+        console.log('listenForConversationChanged', snapshot.data());
+        // conversation data
+        const data = snapshot.data();
+        const conversation = plainToClass(Conversation, data, {
+          excludeExtraneousValues: true,
+        });
+        onChanged(conversation);
+      });
+  };
+
+  loadUnreadCount = async (conversationId: string, userId: string) => {
+    const data = await firestore()
+      .collection('conversations')
+      .doc(conversationId)
+      .collection('messages')
+      .where('unreads', 'array-contains', userId)
+      .get();
+    return data.docs.length;
+  };
+
+  listenForMessagesUnreadChanged = (
+    conversationId: string,
+    userId: string,
+    onUnreadChange: (unreadCount: number) => void,
+  ) => {
+    return firestore()
+      .collection('conversations')
+      .doc(conversationId)
+      .collection('messages')
+      .onSnapshot(async () => {
+        const unreadCount = await this.loadUnreadCount(conversationId, userId);
+        onUnreadChange(unreadCount);
+      });
+  };
+
+  markMessageAsRead = async (
+    conversationId: string,
+    messageId: string,
+    userId: string,
+  ) => {
+    try {
+      await firestore()
+        .collection('conversations')
+        .doc(conversationId)
+        .collection('messages')
+        .doc(messageId)
+        .update({
+          unreads: firestore.FieldValue.arrayRemove(userId),
+        });
+    } catch (e) {
+      console.log(e);
+    }
   };
 }
 

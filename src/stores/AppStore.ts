@@ -91,6 +91,7 @@ class AppStore {
       console.log('already exist');
       // go to Chat Detail
     }
+    return conversation;
   };
 }
 

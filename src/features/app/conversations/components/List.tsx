@@ -3,6 +3,8 @@ import { View, FlatList, StyleSheet, Text } from 'react-native';
 import Conversation from '@src/stores/Conversation';
 import colors from '@src/constants/colors';
 import { TouchableOpacity } from '@src/components';
+import ChatServices from '@src/api/ChatServices';
+import { observer } from 'mobx-react';
 
 type ConversationListProps = {
   conversations: Conversation[];
@@ -12,17 +14,44 @@ type ConversationListProps = {
 
 const bgColors = ['red', 'green', 'blue'];
 
-export default class ConversationList extends React.PureComponent<
-  ConversationListProps
-> {
-  _renderItem = ({ item: data }: { item: Conversation }) => {
-    const conversationName = data.getConversationName(this.props.currentUserId);
+type ConversationItemProps = {
+  currentUserId: string;
+  onPressConversation: (conversation: Conversation) => void;
+  data: Conversation;
+};
+
+@observer
+class ConversationItem extends React.PureComponent<ConversationItemProps> {
+  subscriber: (() => void) | null = null;
+  unreadSubscriber: (() => void) | null = null;
+
+  componentDidMount = () => {
+    this.subscriber = ChatServices.listenForConversationChanged(
+      this.props.data.id,
+      conversation => {
+        this.props.data.update(conversation);
+      },
+    );
+    this.unreadSubscriber = ChatServices.listenForMessagesUnreadChanged(
+      this.props.data.id,
+      this.props.currentUserId,
+      unread => {
+        this.props.data.setUnreadCount(unread);
+      },
+    );
+  };
+
+  componentWillUnmount = () => {};
+
+  render() {
+    const { currentUserId, onPressConversation, data } = this.props;
+    const conversationName = data.getConversationName(currentUserId);
     const backgroundColor =
       bgColors[conversationName.charCodeAt(0) % bgColors.length];
     return (
       <TouchableOpacity
         style={styles.container}
-        onPress={() => this.props.onPressConversation(data)}>
+        onPress={() => onPressConversation(data)}>
         <View style={[styles.avatarView, { backgroundColor }]}>
           <Text style={styles.avatarText}>{conversationName.charAt(0)}</Text>
         </View>
@@ -44,7 +73,19 @@ export default class ConversationList extends React.PureComponent<
         </View>
       </TouchableOpacity>
     );
-  };
+  }
+}
+
+export default class ConversationList extends React.PureComponent<
+  ConversationListProps
+> {
+  _renderItem = ({ item: data }: { item: Conversation }) => (
+    <ConversationItem
+      data={data}
+      currentUserId={this.props.currentUserId}
+      onPressConversation={this.props.onPressConversation}
+    />
+  );
 
   render() {
     return (

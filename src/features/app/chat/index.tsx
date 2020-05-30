@@ -31,6 +31,14 @@ export default class ChatScreen extends React.Component<
     this.messageSubscriber = ChatServices.listenForMessages(
       this.conversation.id,
       message => {
+        //
+        if (AppStore.user) {
+          ChatServices.markMessageAsRead(
+            this.conversation.id,
+            message.id,
+            AppStore.user.id,
+          );
+        }
         message.setSender(this.conversation.findUser(message.senderId));
         const newState = GiftedChat.append(this.state.messages, [
           message.toGiftedMessage(),
@@ -62,7 +70,6 @@ export default class ChatScreen extends React.Component<
     if (!AppStore.user) {
       return null;
     }
-    const conversation = this.props.navigation.getParam('conversation');
     return (
       <Container>
         <Header

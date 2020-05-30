@@ -5,6 +5,7 @@ import IconUsers from '@src/assets/ic_users.png';
 import IconPlus from '@src/assets/plus_Icon.png';
 import { TouchableOpacity, Container } from '@src/components';
 import Screens from './Screens';
+import NavigationService from './NavigationService';
 
 type TabbarProps = {
   navigation: any;
@@ -17,11 +18,15 @@ const Tabs = [
   },
   {
     icon: IconUsers,
-    screen: Screens.USERS_SCREEN,
+    screen: Screens.USER_STACK,
   },
 ];
 
 export default class Tabbar extends React.PureComponent<TabbarProps> {
+  _onPressCreateGroup = () => {
+    NavigationService.navigate(Screens.CREATE_GROUP_CHAT);
+  };
+
   render() {
     const currentIndex = this.props.navigation.state.index;
     const tabs = this.props.navigation.state.routes;
@@ -48,7 +53,9 @@ export default class Tabbar extends React.PureComponent<TabbarProps> {
             </TouchableOpacity>
           ))}
         </View>
-        <TouchableOpacity style={styles.plusButton}>
+        <TouchableOpacity
+          onPress={this._onPressCreateGroup}
+          style={styles.plusButton}>
           <Image source={IconPlus} style={styles.plusIcon} />
         </TouchableOpacity>
       </View>
@@ -59,13 +66,14 @@ export default class Tabbar extends React.PureComponent<TabbarProps> {
 const styles = StyleSheet.create({
   container: {
     height: 85 + Container.bottomSpacing,
+    backgroundColor: '#ffffff',
   },
   tabbar: {
     marginTop: 25,
     height: 60 + Container.bottomSpacing,
     paddingBottom: Container.bottomSpacing,
-    flexDirection: 'row',
     backgroundColor: '#fbfcff',
+    flexDirection: 'row',
     borderWidth: 0.5,
     borderColor: '#d4d4d4',
   },

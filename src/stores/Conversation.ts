@@ -1,6 +1,7 @@
 import { User } from './User';
 import moment from 'moment';
 import { Expose } from 'class-transformer';
+import { observable } from 'mobx';
 
 export default class Conversation {
   constructor(
@@ -26,16 +27,19 @@ export default class Conversation {
   name: string = '';
 
   @Expose()
+  @observable
   lastMessage?: string = undefined;
 
   @Expose()
   createdAt: number = 0;
 
   @Expose()
+  @observable
   updatedAt: number = 0;
 
   users: User[] = [];
 
+  @observable
   unreadCount: number = 0;
 
   setUsers = (users: User[]) => {
@@ -63,5 +67,15 @@ export default class Conversation {
 
   findUser = (userId: string) => {
     return this.users.filter(t => t.id === userId)[0];
+  };
+
+  update = (newConversation: Conversation) => {
+    this.lastMessage = newConversation.lastMessage;
+    this.updatedAt = newConversation.updatedAt;
+    console.log('updated');
+  };
+
+  setUnreadCount = (count: number) => {
+    this.unreadCount = count;
   };
 }
